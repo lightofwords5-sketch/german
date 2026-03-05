@@ -53,4 +53,37 @@ def render_hero_section():
         <h1 style='font-size: 3em; color: #ff8a00;'>Willkommen bei German Camp 🇩🇪</h1>
         <p style='font-size: 1.2em; color: #ccc;'>تعلم الألمانية بذكاء، تفاعل مع المعلم الآلي، واستمع للنطق الصحيح.</p>
     </div>
-    """, unsafe_allow_html=True)
+    """, unsafe_allow_html=True) 
+    import streamlit as st
+import json
+import requests
+import os
+
+# دالة لتحميل ملف الـ Lottie من الجهاز
+def load_lottie_file(filepath: str):
+    if os.path.exists(filepath):
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
+
+# دالة لعرض الرسوم المتحركة
+def render_lottie_animation(filepath: str, height=200):
+    lottie_json = load_lottie_file(filepath)
+    if lottie_json:
+        # بنستخدم مكتبة st.lottie لو مثبتها، أو بنستخدم st.components
+        try:
+            from streamlit_lottie import st_lottie
+            st_lottie(lottie_json, height=height, key=filepath)
+        except ImportError:
+            # لو مش مثبت مكتبة streamlit-lottie، بنستخدم الـ Components كحل بديل
+            import streamlit.components.v1 as components
+            lottie_url = f"https://assets10.lottiefiles.com/packages/{filepath.split('/')[-1]}"
+            components.html(f'<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script><lottie-player src="{lottie_url}" background="transparent" speed="1" style="width: 100%; height: {height}px;" loop autoplay></lottie-player>', height=height)
+    else:
+        st.error(f"⚠️ ملف Lottie غير موجود: {filepath}")
+
+# مثال: استخدامها في صفحة الـ AI Tutor
+def ai_tutor_page():
+    render_lottie_animation("assets/lottie/ai_robot.json", height=250)
+    st.markdown('<div class="glass-card"><h2>🤖 المعلم الذكي (AI Tutor)</h2></div>', unsafe_allow_html=True)
+    # باقي كود الـ AI...
